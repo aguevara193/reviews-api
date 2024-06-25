@@ -28,60 +28,28 @@ namespace ReviewApi.Services
 
         public async Task<string> UploadImageAsync(Stream imageStream, string fileName)
         {
-            try
+            using var httpClient = new HttpClient();
+            var extension = Path.GetExtension(fileName).ToLower();
+            var mimeType = GetMimeType(extension);
+
+            using var content = new MultipartFormDataContent();
+            using var fileStreamContent = new StreamContent(imageStream);
+            fileStreamContent.Headers.ContentType = new MediaTypeHeaderValue(mimeType);
+            content.Add(fileStreamContent, "file", fileName);
+
+            var request = new HttpRequestMessage
             {
-                var extension = Path.GetExtension(fileName).ToLower();
-                var mimeType = GetMimeType(extension);
-
-                _logger.LogInformation($"Uploading file {fileName} with MIME type {mimeType}");
-
-                using var content = new MultipartFormDataContent();
-                using var fileStreamContent = new StreamContent(imageStream);
-                fileStreamContent.Headers.ContentType = new MediaTypeHeaderValue(mimeType);
-                content.Add(fileStreamContent, "file", fileName);
-
-                _logger.LogInformation($"File content type: {fileStreamContent.Headers.ContentType}");
-
-                var request = new HttpRequestMessage
-                {
-                    Method = HttpMethod.Post,
-                    RequestUri = new Uri($"https://api.cloudflare.com/client/v4/accounts/{_cloudflareAccountId}/images/v1"),
-                    Content = content,
-                };
-                request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _cloudflareApiToken);
-
-                var response = await _httpClient.SendAsync(request);
-
-                _logger.LogInformation($"Cloudflare response status code: {response.StatusCode}");
-                _logger.LogInformation($"Cloudflare response content: {await response.Content.ReadAsStringAsync()}");
-
-                response.EnsureSuccessStatusCode();
-
-                var responseContent = await response.Content.ReadAsStringAsync();
-                var imageUrl = ParseImageUrl(responseContent);
-
-                return imageUrl;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error uploading image to Cloudflare");
-                throw;
-            }
-        }
-
-        private string GetMimeType(string extension)
-        {
-            return extension switch
-            {
-                ".jpg" => "image/jpeg",
-                ".jpeg" => "image/jpeg",
-                ".png" => "image/png",
-                ".gif" => "image/gif",
-                ".bmp" => "image/bmp",
-                ".webp" => "image/webp",
-                ".avif" => "image/avif",
-                _ => "application/octet-stream",
+                Method = HttpMethod.Post,
+                RequestUri = new Uri($"https://api.cloudflare.com/client/v4/accounts/{_cloudflareApiToken}/images/v1"),
+                Content = content,
             };
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _cloudflareAccountId);
+
+            var response = await httpClient.SendAsync(request);
+            response.EnsureSuccessStatusCode();
+
+            var responseContent = await response.Content.ReadAsStringAsync();
+            return ParseImageUrl(responseContent);
         }
 
         private string ParseImageUrl(string responseContent)
@@ -95,5 +63,22 @@ namespace ReviewApi.Services
             }
             throw new InvalidOperationException("Failed to parse image URL from Cloudflare response.");
         }
+
+        private string GetMimeType(string extension)
+        {
+            return extension switch
+            {
+                ".jpg" => "image/jpeg",
+                ".jpeg" => "image/jpeg",
+                ".png" => "image/png",
+                ".gif" => "image/gif",
+                ".bmp" => "image/bmp",
+                ".webp" => "image/webp",
+                ".avif" => "image/avif",
+                _ => throw new NotSupportedException($"Extension {extension} is not supported"),
+            };
+        }
+
+        
     }
 }
