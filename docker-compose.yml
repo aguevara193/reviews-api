@@ -14,6 +14,7 @@ services:
       - CLOUD_FLARE_ACCOUNT_ID=996e61a9da1f0f49e4ad5770932100d2
       - CLOUD_FLARE_API_TOKEN=cYgcxEz_yWt07vFaKv2qJ7Wr0g6IJF-vzDtWlH7c
       - X-Api-Key=3R2YJKjzQeRG9+Bx5P8M3nB+d8v6TgRWk3yzFjZa+Eo=
+      - LocalSavePath=/root/images/
     depends_on:
       - mongodb
       - redis

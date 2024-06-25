@@ -17,15 +17,34 @@ namespace ReviewApi.Services
         private readonly string _cloudflareAccountId;
         private readonly string _cloudflareApiToken;
         private readonly ILogger<ImageService> _logger;
+        private readonly string _localSavePath;
 
         public ImageService(HttpClient httpClient, IConfiguration config, ILogger<ImageService> logger)
         {
             _httpClient = httpClient;
             _cloudflareAccountId = config["CLOUD_FLARE_ACCOUNT_ID"];
             _cloudflareApiToken = config["CLOUD_FLARE_API_TOKEN"];
+            _localSavePath = config["LocalSavePath"];
             _logger = logger;
         }
-
+        public async Task<string> SaveImageLocallyAsync(Stream imageStream, string fileName)
+        {
+            try
+            {
+                var filePath = Path.Combine(_localSavePath, fileName);
+                using (var fileStream = new FileStream(filePath, FileMode.Create, FileAccess.Write))
+                {
+                    await imageStream.CopyToAsync(fileStream);
+                }
+                _logger.LogInformation($"Image saved locally at: {filePath}");
+                return filePath;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error saving image locally");
+                throw;
+            }
+        }
         public async Task<string> UploadImageAsync(Stream imageStream, string fileName)
         {
             using var httpClient = new HttpClient();
