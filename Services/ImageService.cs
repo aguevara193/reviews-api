@@ -18,9 +18,9 @@ namespace ReviewApi.Services
         private readonly string _cloudflareApiToken;
         private readonly ILogger<ImageService> _logger;
 
-        public ImageService(IConfiguration config, ILogger<ImageService> logger)
+        public ImageService(HttpClient httpClient, IConfiguration config, ILogger<ImageService> logger)
         {
-            _httpClient = new HttpClient();
+            _httpClient = httpClient;
             _cloudflareAccountId = config["CLOUD_FLARE_ACCOUNT_ID"];
             _cloudflareApiToken = config["CLOUD_FLARE_API_TOKEN"];
             _logger = logger;
