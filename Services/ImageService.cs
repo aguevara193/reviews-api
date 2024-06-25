@@ -27,23 +27,20 @@ namespace ReviewApi.Services
             _localSavePath = config["LocalSavePath"];
             _logger = logger;
         }
-        public async Task<string> SaveImageLocallyAsync(Stream imageStream, string fileName)
+        public async Task SaveImageLocallyAsync(Stream imageStream, string fileName)
         {
             try
             {
-                var directoryPath = Path.Combine(_localSavePath);
-                if (!Directory.Exists(directoryPath))
-                {
-                    Directory.CreateDirectory(directoryPath);
-                }
+                var filePath = Path.Combine("/root/images", fileName);
 
-                var filePath = Path.Combine(directoryPath, fileName);
-                using (var fileStream = new FileStream(filePath, FileMode.Create, FileAccess.Write))
-                {
-                    await imageStream.CopyToAsync(fileStream);
-                }
-                _logger.LogInformation($"Image saved locally at: {filePath}");
-                return filePath;
+                _logger.LogInformation($"Saving file locally to {filePath}");
+
+                Directory.CreateDirectory("/root/images");
+
+                using var fileStream = new FileStream(filePath, FileMode.Create, FileAccess.Write);
+                await imageStream.CopyToAsync(fileStream);
+
+                _logger.LogInformation("File saved successfully");
             }
             catch (Exception ex)
             {

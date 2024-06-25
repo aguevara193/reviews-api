@@ -112,8 +112,9 @@ namespace ReviewApi.Controllers
                             var fileName = file.FileName;
                             _logger.LogInformation($"Uploading file {fileName}...");
 
-                            var localFilePath = await _imageService.SaveImageLocallyAsync(stream, fileName);
-                            pictureUrls.Add(localFilePath);
+                            await _imageService.SaveImageLocallyAsync(new MemoryStream(stream.ToArray()), file.FileName);
+
+                          //  pictureUrls.Add(localFilePath);
                             //  var imageUrl = await _imageService.UploadImageAsync(stream, fileName);
                            // pictureUrls.Add(imageUrl);
                         }
