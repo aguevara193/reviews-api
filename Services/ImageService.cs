@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text.Json;
@@ -33,12 +35,11 @@ namespace ReviewApi.Services
 
                 _logger.LogInformation($"Uploading file {fileName} with MIME type {mimeType}");
 
+                var fileBytes = ReadFully(imageStream);
                 using var content = new MultipartFormDataContent();
-                using var fileStreamContent = new StreamContent(imageStream);
+                using var fileStreamContent = new ByteArrayContent(fileBytes);
                 fileStreamContent.Headers.ContentType = new MediaTypeHeaderValue(mimeType);
                 content.Add(fileStreamContent, "file", fileName);
-
-                _logger.LogInformation($"File content type: {fileStreamContent.Headers.ContentType}");
 
                 var request = new HttpRequestMessage
                 {
@@ -67,7 +68,6 @@ namespace ReviewApi.Services
             }
         }
 
-
         private string GetMimeType(string extension)
         {
             return extension switch
@@ -93,6 +93,15 @@ namespace ReviewApi.Services
                 return variantsElement[0].GetString();
             }
             throw new InvalidOperationException("Failed to parse image URL from Cloudflare response.");
+        }
+
+        private byte[] ReadFully(Stream input)
+        {
+            using (var ms = new MemoryStream())
+            {
+                input.CopyTo(ms);
+                return ms.ToArray();
+            }
         }
     }
 }
