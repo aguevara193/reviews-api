@@ -27,34 +27,45 @@ namespace ReviewApi.Services
 
         public async Task<string> UploadImageAsync(Stream imageStream, string fileName)
         {
-            var extension = Path.GetExtension(fileName).ToLower();
-            var mimeType = MimeTypes.GetMimeType(extension);
-
-            var content = new MultipartFormDataContent();
-            var fileContent = new StreamContent(imageStream);
-            fileContent.Headers.ContentType = new MediaTypeHeaderValue(mimeType);
-            content.Add(fileContent, "file", fileName);
-
-            var request = new HttpRequestMessage
+            try
             {
-                Method = HttpMethod.Post,
-                RequestUri = new Uri($"https://api.cloudflare.com/client/v4/accounts/{_cloudflareAccountId}/images/v1"),
-                Content = content
-            };
-            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _cloudflareApiToken);
+                var extension = Path.GetExtension(fileName).ToLower();
+                var mimeType = MimeTypes.GetMimeType(extension);
+               
 
-            var response = await _httpClient.SendAsync(request);
-            response.EnsureSuccessStatusCode();
+                var content = new MultipartFormDataContent();
+                var fileContent = new StreamContent(imageStream);
+                fileContent.Headers.ContentType = new MediaTypeHeaderValue(mimeType);
+                content.Add(fileContent, "file", fileName);
 
-            var responseContent = await response.Content.ReadAsStringAsync();
-            var imageUrl = ParseImageUrl(responseContent);
+                var request = new HttpRequestMessage
+                {
+                    Method = HttpMethod.Post,
+                    RequestUri = new Uri($"https://api.cloudflare.com/client/v4/accounts/{_cloudflareAccountId}/images/v1"),
+                    Content = content
+                };
+                request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _cloudflareApiToken);
 
-            return imageUrl;
+              
+                var response = await _httpClient.SendAsync(request);
+                response.EnsureSuccessStatusCode();
+
+                var responseContent = await response.Content.ReadAsStringAsync();
+                var imageUrl = ParseImageUrl(responseContent);
+              
+
+                return imageUrl;
+            }
+            catch (Exception ex)
+            {
+              
+                throw;
+            }
         }
-
 
         private string ParseImageUrl(string responseContent)
         {
+     
             using var jsonDoc = JsonDocument.Parse(responseContent);
             if (jsonDoc.RootElement.TryGetProperty("result", out var resultElement) &&
                 resultElement.TryGetProperty("variants", out var variantsElement) &&

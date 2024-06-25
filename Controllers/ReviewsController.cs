@@ -138,7 +138,6 @@ namespace ReviewApi.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, "Internal server error");
             }
         }
-
         // GET /api/reviews/by-ids
         [HttpGet("by-ids")]
         public async Task<ActionResult<List<Review>>> GetReview([FromQuery] string ids)
