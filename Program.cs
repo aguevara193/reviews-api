@@ -9,9 +9,6 @@ using MongoDB.Driver;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Load environment variables from .env file if present
-//DotNetEnv.Env.Load();
-
 // Add services to the container.
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
@@ -26,7 +23,6 @@ builder.Services.AddCors(options =>
 });
 
 builder.Services.AddSingleton<ReviewService>();
-builder.Services.AddSingleton<ImageService>();
 builder.Services.AddHttpClient<ImageService>(); // Register HttpClient for ImageService
 builder.Services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect(builder.Configuration.GetConnectionString("Redis")));
 
