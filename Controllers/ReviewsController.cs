@@ -19,12 +19,14 @@ namespace ReviewApi.Controllers
         private readonly ReviewService _reviewService;
         private readonly ImageService _imageService;
         private readonly IDatabase _redisDb;
+        private readonly ILogger<ReviewsController> _logger;
 
         public ReviewsController(ReviewService reviewService, ImageService imageService, IConnectionMultiplexer redis)
         {
             _reviewService = reviewService;
             _imageService = imageService;
             _redisDb = redis.GetDatabase();
+            _logger = logger;
         }
 
         // GET /api/reviews
@@ -108,6 +110,7 @@ namespace ReviewApi.Controllers
                             using var stream = new MemoryStream();
                             await file.CopyToAsync(stream);
                             var fileName = file.FileName;
+                            _logger.LogInformation($"Uploading file {fileName}...");
                             var imageUrl = await _imageService.UploadImageAsync(stream, fileName);
                             pictureUrls.Add(imageUrl);
                         }
@@ -134,7 +137,7 @@ namespace ReviewApi.Controllers
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error creating review: {ex.Message}");
+                _logger.LogError(ex, "Error creating review");
                 return StatusCode(StatusCodes.Status500InternalServerError, "Internal server error");
             }
         }
