@@ -18,9 +18,9 @@ namespace ReviewApi.Services
         private readonly string _cloudflareApiToken;
         private readonly ILogger<ImageService> _logger;
 
-        public ImageService(HttpClient httpClient, IConfiguration config, ILogger<ImageService> logger)
+        public ImageService(IConfiguration config, ILogger<ImageService> logger)
         {
-            _httpClient = httpClient;
+            _httpClient = new HttpClient();
             _cloudflareAccountId = config["CLOUD_FLARE_ACCOUNT_ID"];
             _cloudflareApiToken = config["CLOUD_FLARE_API_TOKEN"];
             _logger = logger;
@@ -35,11 +35,12 @@ namespace ReviewApi.Services
 
                 _logger.LogInformation($"Uploading file {fileName} with MIME type {mimeType}");
 
-                var fileBytes = ReadFully(imageStream);
                 using var content = new MultipartFormDataContent();
-                using var fileStreamContent = new ByteArrayContent(fileBytes);
+                using var fileStreamContent = new StreamContent(imageStream);
                 fileStreamContent.Headers.ContentType = new MediaTypeHeaderValue(mimeType);
                 content.Add(fileStreamContent, "file", fileName);
+
+                _logger.LogInformation($"File content type: {fileStreamContent.Headers.ContentType}");
 
                 var request = new HttpRequestMessage
                 {
@@ -93,15 +94,6 @@ namespace ReviewApi.Services
                 return variantsElement[0].GetString();
             }
             throw new InvalidOperationException("Failed to parse image URL from Cloudflare response.");
-        }
-
-        private byte[] ReadFully(Stream input)
-        {
-            using (var ms = new MemoryStream())
-            {
-                input.CopyTo(ms);
-                return ms.ToArray();
-            }
         }
     }
 }
