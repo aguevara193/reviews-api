@@ -16,41 +16,17 @@ namespace ReviewApi.Services
         private readonly HttpClient _httpClient;
         private readonly string _cloudflareAccountId;
         private readonly string _cloudflareApiToken;
-        private readonly ILogger<ImageService> _logger;
         private readonly string _localSavePath;
 
-        public ImageService(HttpClient httpClient, IConfiguration config, ILogger<ImageService> logger)
+        public ImageService(HttpClient httpClient, IConfiguration config)
         {
-            _httpClient = httpClient;
+            _httpClient = new HttpClient();
             _cloudflareAccountId = config["CLOUD_FLARE_ACCOUNT_ID"];
             _cloudflareApiToken = config["CLOUD_FLARE_API_TOKEN"];
-            _localSavePath = config["LocalSavePath"];
-            _logger = logger;
         }
-        public async Task SaveImageLocallyAsync(Stream imageStream, string fileName)
-        {
-            try
-            {
-                var filePath = Path.Combine("/root/images", fileName);
-
-                _logger.LogInformation($"Saving file locally to {filePath}");
-
-                Directory.CreateDirectory("/root/images");
-
-                using var fileStream = new FileStream(filePath, FileMode.Create, FileAccess.Write);
-                await imageStream.CopyToAsync(fileStream);
-
-                _logger.LogInformation("File saved successfully");
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error saving image locally");
-                throw;
-            }
-        }
+      
         public async Task<string> UploadImageAsync(Stream imageStream, string fileName)
         {
-            using var httpClient = new HttpClient();
             var extension = Path.GetExtension(fileName).ToLower();
             var mimeType = GetMimeType(extension);
 
@@ -67,7 +43,7 @@ namespace ReviewApi.Services
             };
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _cloudflareApiToken);
 
-            var response = await httpClient.SendAsync(request);
+            var response = await _httpClient.SendAsync(request);
             response.EnsureSuccessStatusCode();
 
             var responseContent = await response.Content.ReadAsStringAsync();

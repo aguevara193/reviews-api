@@ -112,10 +112,9 @@ namespace ReviewApi.Controllers
                             var fileName = file.FileName;
                             _logger.LogInformation($"Uploading file {fileName}...");
 
-                         
-
-            
-                              var imageUrl = await _imageService.UploadImageAsync(stream, fileName);
+                        
+                        
+                              var imageUrl = await _imageService.UploadImageAsync(new MemoryStream(stream.ToArray()), fileName);
                             pictureUrls.Add(imageUrl);
                         }
                     }
