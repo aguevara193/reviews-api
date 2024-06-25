@@ -108,7 +108,8 @@ namespace ReviewApi.Controllers
                             using var stream = new MemoryStream();
                             await file.CopyToAsync(stream);
                             var fileName = file.FileName;
-                            var imageUrl = await _imageService.UploadImageAsync(stream, fileName);
+                            var mimeType = file.ContentType; // Get the MIME type from the uploaded file
+                            var imageUrl = await _imageService.UploadImageAsync(stream, fileName, mimeType);
                             pictureUrls.Add(imageUrl);
                         }
                     }
@@ -194,7 +195,8 @@ namespace ReviewApi.Controllers
                             using var stream = new MemoryStream();
                             await file.CopyToAsync(stream);
                             var fileName = file.FileName;
-                            var imageUrl = await _imageService.UploadImageAsync(stream, fileName);
+                            var mimeType = file.ContentType; // Get the MIME type from the uploaded file
+                            var imageUrl = await _imageService.UploadImageAsync(stream, fileName, mimeType);
                             pictureUrls.Add(imageUrl);
                         }
                     }
@@ -212,6 +214,7 @@ namespace ReviewApi.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, "Internal server error");
             }
         }
+
 
         // DELETE /api/reviews/{id}
         [HttpDelete("{id:length(24)}")]
