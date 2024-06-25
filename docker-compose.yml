@@ -1,0 +1,59 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__ReviewDb=mongodb://mongodb:27017
+      - ConnectionStrings__Redis=redis:6379
+      - GoogleCloud__BucketName=review-api-images
+      - X-Api-Key=3R2YJKjzQeRG9+Bx5P8M3nB+d8v6TgRWk3yzFjZa+Eo=
+      - GOOGLE_APPLICATION_CREDENTIALS=/run/secrets/google-credentials.json
+    depends_on:
+      - mongodb
+      - redis
+    secrets:
+      - google-credentials
+
+  mongodb:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+
+  redis:
+    image: redis:latest
+    ports:
+      - "6379:6379"
+
+  nginx:
+    image: nginx:latest
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+      - ./certbot/conf:/etc/letsencrypt
+      - ./certbot/www:/var/www/certbot
+    depends_on:
+      - app
+
+  certbot:
+    image: certbot/certbot
+    volumes:
+      - ./certbot/conf:/etc/letsencrypt
+      - ./certbot/www:/var/www/certbot
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $!; done;'"
+
+volumes:
+  mongo-data:
+
+secrets:
+  google-credentials:
+    file: ./secrets/google-credentials.json
