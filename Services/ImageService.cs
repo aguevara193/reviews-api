@@ -30,16 +30,16 @@ namespace ReviewApi.Services
             var extension = Path.GetExtension(fileName).ToLower();
             var mimeType = MimeTypes.GetMimeType(extension);
 
-            using var content = new MultipartFormDataContent();
-            using var fileStreamContent = new StreamContent(imageStream);
-            fileStreamContent.Headers.ContentType = new MediaTypeHeaderValue(mimeType);
-            content.Add(fileStreamContent, "file", fileName);
+            var content = new MultipartFormDataContent();
+            var fileContent = new StreamContent(imageStream);
+            fileContent.Headers.ContentType = new MediaTypeHeaderValue(mimeType);
+            content.Add(fileContent, "file", fileName);
 
             var request = new HttpRequestMessage
             {
                 Method = HttpMethod.Post,
                 RequestUri = new Uri($"https://api.cloudflare.com/client/v4/accounts/{_cloudflareAccountId}/images/v1"),
-                Content = content,
+                Content = content
             };
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _cloudflareApiToken);
 
@@ -52,9 +52,9 @@ namespace ReviewApi.Services
             return imageUrl;
         }
 
+
         private string ParseImageUrl(string responseContent)
         {
-            // Parse the response to extract the URL
             using var jsonDoc = JsonDocument.Parse(responseContent);
             if (jsonDoc.RootElement.TryGetProperty("result", out var resultElement) &&
                 resultElement.TryGetProperty("variants", out var variantsElement) &&
