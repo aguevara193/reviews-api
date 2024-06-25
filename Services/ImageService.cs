@@ -18,7 +18,7 @@ namespace ReviewApi.Services
         private readonly string _cloudflareApiToken;
         private readonly string _localSavePath;
 
-        public ImageService(HttpClient httpClient, IConfiguration config)
+        public ImageService(IConfiguration config)
         {
             _httpClient = new HttpClient();
             _cloudflareAccountId = config["CLOUD_FLARE_ACCOUNT_ID"];
