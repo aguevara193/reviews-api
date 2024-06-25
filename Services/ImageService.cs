@@ -31,7 +31,13 @@ namespace ReviewApi.Services
         {
             try
             {
-                var filePath = Path.Combine(_localSavePath, fileName);
+                var directoryPath = Path.Combine(_localSavePath);
+                if (!Directory.Exists(directoryPath))
+                {
+                    Directory.CreateDirectory(directoryPath);
+                }
+
+                var filePath = Path.Combine(directoryPath, fileName);
                 using (var fileStream = new FileStream(filePath, FileMode.Create, FileAccess.Write))
                 {
                     await imageStream.CopyToAsync(fileStream);
