@@ -40,10 +40,10 @@ namespace ReviewApi.Services
             var request = new HttpRequestMessage
             {
                 Method = HttpMethod.Post,
-                RequestUri = new Uri($"https://api.cloudflare.com/client/v4/accounts/{_cloudflareApiToken}/images/v1"),
+                RequestUri = new Uri($"https://api.cloudflare.com/client/v4/accounts/{_cloudflareAccountId}/images/v1"),
                 Content = content,
             };
-            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _cloudflareAccountId);
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _cloudflareApiToken);
 
             var response = await httpClient.SendAsync(request);
             response.EnsureSuccessStatusCode();
