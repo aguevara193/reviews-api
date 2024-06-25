@@ -15,7 +15,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("ReviewApi")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+dff7fcf324c025d6f6e492a2e8d8ecde3bee1c96")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+5aa1250483c71c0b92d008c05917b4409dadf5d3")]
 [assembly: System.Reflection.AssemblyProductAttribute("ReviewApi")]
 [assembly: System.Reflection.AssemblyTitleAttribute("ReviewApi")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

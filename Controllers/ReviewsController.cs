@@ -21,7 +21,7 @@ namespace ReviewApi.Controllers
         private readonly IDatabase _redisDb;
         private readonly ILogger<ReviewsController> _logger;
 
-        public ReviewsController(ReviewService reviewService, ImageService imageService, IConnectionMultiplexer redis)
+        public ReviewsController(ReviewService reviewService, ImageService imageService, IConnectionMultiplexer redis, ILogger<ReviewsController> logger)
         {
             _reviewService = reviewService;
             _imageService = imageService;
