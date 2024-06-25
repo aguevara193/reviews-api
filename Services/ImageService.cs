@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
@@ -26,33 +27,42 @@ namespace ReviewApi.Services
 
         public async Task<string> UploadImageAsync(Stream imageStream, string fileName)
         {
-            var request = new HttpRequestMessage(HttpMethod.Post, $"https://api.cloudflare.com/client/v4/accounts/{_cloudflareAccountId}/images/v1");
+            var extension = Path.GetExtension(fileName).ToLower();
+            var mimeType = MimeTypes.GetMimeType(extension);
 
-            var content = new MultipartFormDataContent
+            using var content = new MultipartFormDataContent();
+            using var fileStreamContent = new StreamContent(imageStream);
+            fileStreamContent.Headers.ContentType = new MediaTypeHeaderValue(mimeType);
+            content.Add(fileStreamContent, "file", fileName);
+
+            var request = new HttpRequestMessage
             {
-                { new StreamContent(imageStream), "file", fileName }
+                Method = HttpMethod.Post,
+                RequestUri = new Uri($"https://api.cloudflare.com/client/v4/accounts/{_cloudflareAccountId}/images/v1"),
+                Content = content,
             };
-
-            request.Content = content;
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _cloudflareApiToken);
 
             var response = await _httpClient.SendAsync(request);
             response.EnsureSuccessStatusCode();
 
-            var responseBody = await response.Content.ReadAsStringAsync();
-            var responseJson = JsonConvert.DeserializeObject<CloudflareImageUploadResponse>(responseBody);
+            var responseContent = await response.Content.ReadAsStringAsync();
+            var imageUrl = ParseImageUrl(responseContent);
 
-            return responseJson.Result.Variants.First(); // Return the URL of the uploaded image
+            return imageUrl;
         }
 
-        private class CloudflareImageUploadResponse
+        private string ParseImageUrl(string responseContent)
         {
-            public CloudflareImageResult Result { get; set; }
-        }
-
-        private class CloudflareImageResult
-        {
-            public List<string> Variants { get; set; }
+            // Parse the response to extract the URL
+            using var jsonDoc = JsonDocument.Parse(responseContent);
+            if (jsonDoc.RootElement.TryGetProperty("result", out var resultElement) &&
+                resultElement.TryGetProperty("variants", out var variantsElement) &&
+                variantsElement.GetArrayLength() > 0)
+            {
+                return variantsElement[0].GetString();
+            }
+            throw new InvalidOperationException("Failed to parse image URL from Cloudflare response.");
         }
     }
 }
