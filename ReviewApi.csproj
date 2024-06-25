@@ -17,9 +17,4 @@
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="certbot\conf\" />
-    <Folder Include="certbot\www\" />
-  </ItemGroup>
-
 </Project>

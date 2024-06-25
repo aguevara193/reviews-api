@@ -1,6 +1,5 @@
 C:\Users\gueva\source\repos\ReviewApi\ReviewApi\bin\Debug\net8.0\appsettings.Development.json
 C:\Users\gueva\source\repos\ReviewApi\ReviewApi\bin\Debug\net8.0\appsettings.json
-C:\Users\gueva\source\repos\ReviewApi\ReviewApi\bin\Debug\net8.0\google-credentials.json
 C:\Users\gueva\source\repos\ReviewApi\ReviewApi\bin\Debug\net8.0\ReviewApi.exe
 C:\Users\gueva\source\repos\ReviewApi\ReviewApi\bin\Debug\net8.0\ReviewApi.deps.json
 C:\Users\gueva\source\repos\ReviewApi\ReviewApi\bin\Debug\net8.0\ReviewApi.runtimeconfig.json
@@ -58,3 +57,4 @@ C:\Users\gueva\source\repos\ReviewApi\ReviewApi\obj\Debug\net8.0\refint\ReviewAp
 C:\Users\gueva\source\repos\ReviewApi\ReviewApi\obj\Debug\net8.0\ReviewApi.pdb
 C:\Users\gueva\source\repos\ReviewApi\ReviewApi\obj\Debug\net8.0\ReviewApi.genruntimeconfig.cache
 C:\Users\gueva\source\repos\ReviewApi\ReviewApi\obj\Debug\net8.0\ref\ReviewApi.dll
+C:\Users\gueva\source\repos\ReviewApi\ReviewApi\obj\Debug\net8.0\ReviewApi.sourcelink.json

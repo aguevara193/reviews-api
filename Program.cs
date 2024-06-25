@@ -27,6 +27,7 @@ builder.Services.AddCors(options =>
 
 builder.Services.AddSingleton<ReviewService>();
 builder.Services.AddSingleton<ImageService>();
+builder.Services.AddHttpClient<ImageService>(); // Register HttpClient for ImageService
 builder.Services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect(builder.Configuration.GetConnectionString("Redis")));
 
 // Configure the HTTP request pipeline.
