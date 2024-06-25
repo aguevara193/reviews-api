@@ -38,6 +38,8 @@ namespace ReviewApi.Services
                 fileStreamContent.Headers.ContentType = new MediaTypeHeaderValue(mimeType);
                 content.Add(fileStreamContent, "file", fileName);
 
+                _logger.LogInformation($"File content type: {fileStreamContent.Headers.ContentType}");
+
                 var request = new HttpRequestMessage
                 {
                     Method = HttpMethod.Post,
@@ -64,6 +66,7 @@ namespace ReviewApi.Services
                 throw;
             }
         }
+
 
         private string GetMimeType(string extension)
         {
