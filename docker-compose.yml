@@ -13,7 +13,7 @@ services:
       - ConnectionStrings__Redis=redis:6379
       - GoogleCloud__BucketName=review-api-images
       - X-Api-Key=3R2YJKjzQeRG9+Bx5P8M3nB+d8v6TgRWk3yzFjZa+Eo=
-      - GOOGLE_APPLICATION_CREDENTIALS=/run/secrets/google-credentials.json
+      - GOOGLE_APPLICATION_CREDENTIALS=/run/secrets/google-credentials
     depends_on:
       - mongodb
       - redis
@@ -56,4 +56,4 @@ volumes:
 
 secrets:
   google-credentials:
-    file: ./secrets/google-credentials.json
+    file: /run/secrets/google-credentials.json
